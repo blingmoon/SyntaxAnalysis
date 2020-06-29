@@ -5,6 +5,7 @@
 #include "head/LR.h"
 #include<iostream>
 #include<string>
+#include "head/LL.h"
 using namespace std;
 
 void testLL(){
@@ -13,7 +14,7 @@ void testLL(){
     /*
         A->BAt|a;
         B->b|@;
-        推导不出First(A)包含t;//包含左递归了，但是按照算法3.2无法除去左递归???????????????
+        推导不出First(A)包含t;//包含左递归了，但是按照算法3.2无法除去左递归
     */
 
     //这样可以推导出First(A)中包含t
@@ -25,9 +26,9 @@ void testLL(){
 
     //test[2] = "A1->c$A1$|ad$A1$|@";
 
-    //llGramer::GramerLL c(test, 4);
+    llGramer::GramerLL c(test, 4);
 
-    //c.sim("$id$+$id$*$id$;#");
+    c.sim("$id$+$id$*$id$;#");
 
 }
 
