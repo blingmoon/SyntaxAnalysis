@@ -58,7 +58,7 @@ void testLR(){
 
 
 int main(){
-    //testLL();
-    testLR();
+    testLL();
+    //testLR();
     return 0;
 }
