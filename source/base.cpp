@@ -3,14 +3,13 @@
 //
 #include "../head/base.h"
 
-using namespace baseGramer;
-Elem::Elem(string name, int key, bool isFinally):name(name),key(key),isFinally(isFinally){};
+using namespace base_grammar;
+Elem::Elem(string name, int key, bool isFinally): name(name), key(key), is_finally(isFinally){};
 
 Express::Express(int* expressions, int length):expression(expressions,expressions+length){};
 Express::Express(const vector<int>& expression):expression(expression.begin(),expression.end()){};
 
 int& Express::operator[](int index){
-
     return expression[index];
 }
 
@@ -22,16 +21,12 @@ bool Express::operator>(const Express& b){
         if (expression[i] < b.expression[i]) return false;
         if (expression[i] > b.expression[i])return true;
     }
-    if (maxSize == this->expression.size()) return false;
-    return true;
-
-
-
+    return maxSize != this->expression.size();
 }
 
-vector<string>& publicTools::parseProductions(string EX, vector<string>& productions){
+vector<string>& public_tool::parse_productions(string EX, vector<string>& productions){
     productions.clear();
-    string buffer = "";
+    string buffer;
     int index = 0;		//下标
 
     //非终结符号,是以->结束的
@@ -50,7 +45,7 @@ vector<string>& publicTools::parseProductions(string EX, vector<string>& product
     //解析各个表达式;
     for (int i = index; i < EX.length(); i++){
         if (EX[i] == '?'){
-            buffer = buffer + '?' + EX[++i];
+            buffer += '?' + EX[++i];
         }
         //一个表达式完成
         if (EX[i] == '|'){
@@ -58,26 +53,22 @@ vector<string>& publicTools::parseProductions(string EX, vector<string>& product
             productions.push_back(buffer);
             buffer = "";
         }
-        buffer = buffer + EX[i];
+        buffer += EX[i];
 
     }
-    if (buffer != ""){
+    if (!buffer.empty()){
         productions.push_back(buffer);
         buffer = "";
     }
-
-
     return productions;
 };
-vector<string>& publicTools::parseElem(string production, vector<string>& elems){
+vector<string>& public_tool::parse_elem(string production, vector<string>& elems){
 
     elems.clear();
-    string temp = "";
+    string temp;
 
     //遍历全字符
     for (int i = 0; i < production.length(); i++){
-
-
 
         if (production[i] != '?'&&production[i] != '$'){
             temp = production[i];
@@ -97,9 +88,9 @@ vector<string>& publicTools::parseElem(string production, vector<string>& elems)
             while (production[++i] != '$')
             {
                 if (production[i] == '?'){
-                    temp = temp + production[++i];
+                    temp += production[++i];
                 }
-                temp = temp + production[i];
+                temp += production[i];
             }
             elems.push_back(temp);
 
@@ -110,9 +101,9 @@ vector<string>& publicTools::parseElem(string production, vector<string>& elems)
 
 };
 //合并向量a和向量b,没有重复的结果放在向量a中
-void publicTools::connetVector(vector<int>& a, const vector<int>& b){
+void public_tool::connect_vector(vector<int>& a, const vector<int>& b){
     for (int i = 0; i < b.size(); i++){
-        if (!isInA(a, b[i])){
+        if (!is_in_vector(a, b[i])){
             a.push_back(b[i]);
         }
     }
@@ -122,7 +113,7 @@ void publicTools::connetVector(vector<int>& a, const vector<int>& b){
 
 //判断b是不是在向量a中
 //在的话返回true，不在的话返回false
-bool publicTools::isInA(const vector<int>& a, int b){
+bool public_tool::is_in_vector(const vector<int>& a, int b){
     bool result = false;
     for (int i = 0; i < a.size(); i++){
         if (a[i] == b){

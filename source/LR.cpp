@@ -8,11 +8,11 @@
 #include<algorithm>
 #include<stack>
 using namespace std;
-using namespace lRGramer;
-using namespace publicTools;
+using namespace lr_grammar;
+using namespace public_tool;
 
-//bool isInA(const vector<int>& a, int b);
-//void connetVector(vector<int>& a, const vector<int>& b);
+//bool is_in_vector(const vector<int>& a, int b);
+//void connect_vector(vector<int>& a, const vector<int>& b);
 
 
 //project的实现
@@ -68,9 +68,9 @@ ExpressLR::ExpressLR(const vector<int>& expression):Express(expression){}
 
 
 //LR符号
-ElemLR::ElemLR(string name, int key, bool isFinally) : Elem(name, key, isFinally){}
+ElemRight::ElemRight(string name, int key, bool isFinally) : Elem(name, key, isFinally){}
 
-bool ElemLR::addExpression(ExpressLR expression){
+bool ElemRight::add_expression(ExpressLR expression){
 
     this->expression_of_set.push_back(expression);
     return true;
@@ -88,7 +88,7 @@ DFAState::DFAState(const vector<Project>& project, int index,int elemCount){
     this->statesCount = index;
 
     this->next = new int[elemCount];
-    this->elemcount = elemCount;
+    this->elementCount = elemCount;
     for (int i = 0; i < elemCount; i++){
         next[i] = -1;
     }
@@ -100,9 +100,9 @@ DFAState::DFAState(const DFAState& a){
     }
     this->statesCount = a.statesCount;
 
-    this->next = new int[a.elemcount];
-    this->elemcount = a.elemcount;
-    for (int i = 0; i < elemcount; i++){
+    this->next = new int[a.elementCount];
+    this->elementCount = a.elementCount;
+    for (int i = 0; i < elementCount; i++){
         next[i] = a.next[i];
     }
 }
@@ -138,7 +138,7 @@ DFAState::~DFAState(){
 
 //LR文法
 //构造函数，重中之中,相当于主函数了
-GramerLR::GramerLR(string* generate, int length){
+GrammarLR::GrammarLR(string* generate, int length){
 
     //1.解析所有字符串
     vector<vector<string>> vectorGenrates;//这个是用来存放各个表达式
@@ -146,7 +146,7 @@ GramerLR::GramerLR(string* generate, int length){
     //解析各个表达式,第一个是非终结符号，后面的是产生式
     for (int i = 0; i < length; i++){
         vector<string> temp;
-        parseProductions(generate[i], temp);
+        parse_productions(generate[i], temp);
         vectorGenrates.push_back(temp);
     }
 
@@ -154,49 +154,49 @@ GramerLR::GramerLR(string* generate, int length){
 
     //2.添加非终结符添加到find表中,开始的非终结符就是length个
     for (int i = 0; i < length; i++){
-        addElem(vectorGenrates[i][0], false);
+        add_elem(vectorGenrates[i][0], false);
     }
 
     //3.一个个解析产生式,会添加到find表中
     vector<string> result_of_name;
     for (int i = 0; i < length; i++){
 
-        //ElemLL N_F_E = elems[findName(vectorGenrates[i][0])];//非终结符，接下来要对这个终结符进行exp的添加
+        //ElemLeft N_F_E = elements[find_name(vectorGenrates[i][0])];//非终结符，接下来要对这个终结符进行exp的添加
 
         //对genrates[i]进行分析；
         for (int j = 1; j < vectorGenrates[i].size(); j++){
-            parseElem(vectorGenrates[i][j], result_of_name);
+            parse_elem(vectorGenrates[i][j], result_of_name);
             vector<int> exp;
             for (int m = 0; m < result_of_name.size(); m++){
-                int index = findName(result_of_name[m]);
+                int index = find_name(result_of_name[m]);
                 if (index == -2){
-                    index = addElem(result_of_name[m], true);
+                    index = add_elem(result_of_name[m], true);
                 }
                 exp.push_back(index);
 
             }
-            elems[findName(vectorGenrates[i][0])].addExpression(ExpressLR(exp));
+            elements[find_name(vectorGenrates[i][0])].add_expression(ExpressLR(exp));
         }
     }
 
-    addElem("#", true);
+    add_elem("#", true);
     //添加拓广文法
-    string name = elems[0].name + "'";
-    int index = this->addElem(name, false);
+    string name = elements[0].name + "'";
+    int index = this->add_elem(name, false);
     vector<int> exp;
     exp.push_back(0);
-    elems[index].addExpression(exp);
+    elements[index].add_expression(exp);
 
     //查看输入是不正确
     //测试一下：
     string finnalyC = "finnaly:";
-    for (int i = 0; i < elems.size(); i++){
-        if (!elems[i].isFinally){
-            cout << elems[i].name << "->";
-            for (int j = 0; j < elems[i].expression_of_set.size(); j++){
-                for (int m = 0; m < elems[i].expression_of_set[j].expression.size(); m++){
-                    if (elems[i].expression_of_set[j].expression[m] != -1){
-                        cout << elems[elems[i].expression_of_set[j].expression[m]].name;
+    for (int i = 0; i < elements.size(); i++){
+        if (!elements[i].is_finally){
+            cout << elements[i].name << "->";
+            for (int j = 0; j < elements[i].expression_of_set.size(); j++){
+                for (int m = 0; m < elements[i].expression_of_set[j].expression.size(); m++){
+                    if (elements[i].expression_of_set[j].expression[m] != -1){
+                        cout << elements[elements[i].expression_of_set[j].expression[m]].name;
                     }
                     else
                     {
@@ -209,26 +209,26 @@ GramerLR::GramerLR(string* generate, int length){
         }
         else
         {
-            finnalyC = finnalyC + " " + elems[i].name;
+            finnalyC = finnalyC + " " + elements[i].name;
         }
     }
     cout << finnalyC << endl;
 
     //6.两表生成（在5的时候就不会再添加新的符号了）
     //同时在这里初始化一下First和Follw表
-    get_tow_charIndex();
+    get_tow_char_index();
 
     //7.求first集合
-    this->createFirstSet();
+    this->create_first_set();
 
     //检查一下，first集合
-    for (int i = 0; i < elems.size(); i++){
-        cout << "First[" << elems[i].name << "]={";
-        for (int j = 0; j < First[i].size(); j++){
-            if (First[i][j] == -1) cout << "@ ";
+    for (int i = 0; i < elements.size(); i++){
+        cout << "first[" << elements[i].name << "]={";
+        for (int j = 0; j < first[i].size(); j++){
+            if (first[i][j] == -1) cout << "@ ";
             else
             {
-                cout << elems[First[i][j]].name << " ";
+                cout << elements[first[i][j]].name << " ";
             }
         }
         cout << "}\n";
@@ -236,20 +236,20 @@ GramerLR::GramerLR(string* generate, int length){
 
     //8.求follow集合
     //将#送到开始符号
-    this->Follow[0].push_back(findName("#"));
-    this->createFollowSet();
+    this->follow[0].push_back(find_name("#"));
+    this->create_follow_set();
 
 
-    for (int i = 0; i < elems.size(); i++){
+    for (int i = 0; i < elements.size(); i++){
 
-        if (elems[i].isFinally) continue;
+        if (elements[i].is_finally) continue;
 
-        cout << "Follow[" << elems[i].name << "]={";
-        for (int j = 0; j < Follow[i].size(); j++){
-            if (Follow[i][j] == -1) cout << "@ ";
+        cout << "follow[" << elements[i].name << "]={";
+        for (int j = 0; j < follow[i].size(); j++){
+            if (follow[i][j] == -1) cout << "@ ";
             else
             {
-                cout << elems[Follow[i][j]].name << " ";
+                cout << elements[follow[i][j]].name << " ";
             }
         }
         cout << "}\n";
@@ -257,7 +257,7 @@ GramerLR::GramerLR(string* generate, int length){
 
 
     //生成DFA状态表
-    this->createDFAStates();
+    this->create_dfa_states();
 
     //检测DFA
     for (int i = 0; i < this->states.size(); i++){
@@ -265,11 +265,11 @@ GramerLR::GramerLR(string* generate, int length){
         for (int j = 0; j < states[i].projects.size(); j++){
 
             Project tmp = states[i].projects[j];
-            cout << elems[tmp.elemKey].name << "->";
-            for (int m = 0; m < elems[tmp.elemKey].expression_of_set[tmp.expressIndex].expression.size(); m++){
+            cout << elements[tmp.elemKey].name << "->";
+            for (int m = 0; m < elements[tmp.elemKey].expression_of_set[tmp.expressIndex].expression.size(); m++){
 
-                if (elems[tmp.elemKey].expression_of_set[tmp.expressIndex][m]!=-1){
-                    cout << elems[elems[tmp.elemKey].expression_of_set[tmp.expressIndex][m]].name;
+                if (elements[tmp.elemKey].expression_of_set[tmp.expressIndex][m] != -1){
+                    cout << elements[elements[tmp.elemKey].expression_of_set[tmp.expressIndex][m]].name;
                 }
                 else
                 {
@@ -281,11 +281,11 @@ GramerLR::GramerLR(string* generate, int length){
             cout << "  ProjectPoint:"<<tmp.projectPoint<<endl;
 
         }
-        for (int j = 0; j < states[i].elemcount; j++){
+        for (int j = 0; j < states[i].elementCount; j++){
 
             if (states[i].next[j] != -1){
 
-                cout << elems[j].name << "--" << states[i].next[j]<<"  ";
+                cout << elements[j].name << "--" << states[i].next[j] << "  ";
             }
 
         }
@@ -294,22 +294,22 @@ GramerLR::GramerLR(string* generate, int length){
     }
 
     //创建指导动作的表
-    this->createActionTable();
+    this->create_action_table();
 
     //将表打印出来
     char formatS[] = "%+7s";//栈的格式
     string text="";
     char buffer[8];
-    for (int i = 0; i < elems.size(); i++){
-        sprintf(buffer, formatS, elems[i].name.c_str());
+    for (int i = 0; i < elements.size(); i++){
+        sprintf(buffer, formatS, elements[i].name.c_str());
         text = text + buffer;
     }
     text = text + "\n";
-    for (int i = 0; i < actionTable.size(); i++){
+    for (int i = 0; i < action_table.size(); i++){
 
-        for (int j = 0; j < actionTable[i].size(); j++){
+        for (int j = 0; j < action_table[i].size(); j++){
             string t;
-            switch (actionTable[i][j].type)
+            switch (action_table[i][j].type)
             {
                 case ERROR:
                     t = " ";
@@ -340,7 +340,7 @@ GramerLR::GramerLR(string* generate, int length){
 //find查找，找到的话返回下标，
 //找不到则返回-2
 //-1表示为空，空使用@来表示
-int GramerLR::findName(string name_of_elem){
+int GrammarLR::find_name(string name_of_elem){
     int result = -2;
     if (name_of_elem == "@"){
         result = -1;
@@ -360,11 +360,11 @@ int GramerLR::findName(string name_of_elem){
 
 
 //添加将name添加到表中，并且将在elem中生成对应的元素，添加到elems中
-int GramerLR::addElem(string name, bool isFinally){
-    this->name_of_keys[name] = elems.size();
-    ElemLR t(name, elems.size(), isFinally);
-    elems.push_back(t);
-    return elems.size() - 1;
+int GrammarLR::add_elem(string name, bool isFinally){
+    this->name_of_keys[name] = elements.size();
+    ElemRight t(name, elements.size(), isFinally);
+    elements.push_back(t);
+    return elements.size() - 1;
 }
 
 
@@ -372,73 +372,73 @@ int GramerLR::addElem(string name, bool isFinally){
 
 
 //修改元素
-void GramerLR::updateElem(int elemIndex, int begin, int end, vector<int>& factory){
+void GrammarLR::update_elem(int elemIndex, int begin, int end, vector<int>& factory){
 
 
     stringstream ss;
-    ss << elems.size();
-    int newIndex = addElem(elems[elemIndex].name + ss.str(), false);
+    ss << elements.size();
+    int newIndex = add_elem(elements[elemIndex].name + ss.str(), false);
 
     //先对新的式子添加表达式,将begin到end添加的
     //产生空串的只有第一个begin有这个倾向，别的没有这个倾向,将begin单独拿出来作为特例
     vector<int> t;
     t.clear();
-    if (elems[elemIndex].expression_of_set[begin].expression.size() == factory.size()){
+    if (elements[elemIndex].expression_of_set[begin].expression.size() == factory.size()){
         t.push_back(-1);
     }
     else
     {
-        for (int i = factory.size(); i < elems[elemIndex].expression_of_set[begin].expression.size(); i++){
-            t.push_back(elems[elemIndex].expression_of_set[begin][i]);
+        for (int i = factory.size(); i < elements[elemIndex].expression_of_set[begin].expression.size(); i++){
+            t.push_back(elements[elemIndex].expression_of_set[begin][i]);
         }
     }
-    elems[newIndex].addExpression(t);
+    elements[newIndex].add_expression(t);
 
     for (int i = begin + 1; i < end; i++){
         t.clear();
-        for (int j = factory.size(); j < elems[elemIndex].expression_of_set[i].expression.size(); j++){
-            t.push_back(elems[elemIndex].expression_of_set[i][j]);
+        for (int j = factory.size(); j < elements[elemIndex].expression_of_set[i].expression.size(); j++){
+            t.push_back(elements[elemIndex].expression_of_set[i][j]);
         }
-        elems[newIndex].addExpression(t);
+        elements[newIndex].add_expression(t);
     }
 
 
     //修改老元素了
     //1. 在begin下面放下结果
-    elems[elemIndex].expression_of_set[begin].expression.clear();
+    elements[elemIndex].expression_of_set[begin].expression.clear();
     for (int i = 0; i < factory.size(); i++){
-        elems[elemIndex].expression_of_set[begin].expression.push_back(factory[i]);
+        elements[elemIndex].expression_of_set[begin].expression.push_back(factory[i]);
     }
-    elems[elemIndex].expression_of_set[begin].expression.push_back(newIndex);
+    elements[elemIndex].expression_of_set[begin].expression.push_back(newIndex);
 
     //后面的元素提前
     int moveDistance = end - begin;
-    for (int i = end; i < elems[elemIndex].expression_of_set.size(); i++){
-        elems[elemIndex].expression_of_set[i - moveDistance + 1] = elems[elemIndex].expression_of_set[i];
+    for (int i = end; i < elements[elemIndex].expression_of_set.size(); i++){
+        elements[elemIndex].expression_of_set[i - moveDistance + 1] = elements[elemIndex].expression_of_set[i];
     }
 
     //清楚元素，共清楚moveDistance-1个
     for (int i = 0; i < moveDistance - 1; i++){
-        elems[elemIndex].expression_of_set.pop_back();
+        elements[elemIndex].expression_of_set.pop_back();
     }
 }
 
 
 //根据findtable和Elems来产生终结符下标
-void GramerLR::get_tow_charIndex(){
+void GrammarLR::get_tow_char_index(){
     vector<int> t;
     t.clear();
 
-    for (int i = 0; i < elems.size(); i++){
-        if (elems[i].isFinally){
+    for (int i = 0; i < elements.size(); i++){
+        if (elements[i].is_finally){
             finally_charIndex.push_back(i);
         }
         else
         {
             not_finally_charIndex.push_back(i);
         }
-        First.push_back(t);
-        Follow.push_back(t);
+        first.push_back(t);
+        follow.push_back(t);
 
     }
 
@@ -447,48 +447,48 @@ void GramerLR::get_tow_charIndex(){
 
 
 //获得First集合
-void GramerLR::createFirstSet(){
+void GrammarLR::create_first_set(){
 
-    for (int i = 0; i < elems.size(); i++){
-        getFirst(i);
+    for (int i = 0; i < elements.size(); i++){
+        get_first(i);
     }
 }
 
 //计算elem[elemIndex]的first集合,并且将结果放在First[elemIndex中]
 //返回值，如果是true，说明这个不是空串（elemIndex！=-1）;
 //		  如果是false，说明这个是空串，elemIndex=-1,级这个First集合为（-1）空
-bool GramerLR::getFirst(int elemIndex){
+bool GrammarLR::get_first(int elemIndex){
 
     //空串
     if (elemIndex == -1) return false;
 
     //这个符号的first集合已经求出来了
-    if (First[elemIndex].size() != 0) return true;
+    if (first[elemIndex].size() != 0) return true;
 
     //判断是不是终结符，是的话说明这个first可以直接求
-    if (elems[elemIndex].isFinally){
+    if (elements[elemIndex].is_finally){
         //是终结符,将自己添加就行
-        First[elemIndex].push_back(elemIndex);
+        first[elemIndex].push_back(elemIndex);
     }
     else
     {
         //不是终结符，需要计算这个非终结符的每一个表达式然后在添加上去
         //vector<int> t;
         vector<int> temp;
-        this->firstTemp.clear();//后续准备
+        this->first_temp.clear();//后续准备
         //计算这个产生式的表达式
-        for (int i = 0; i < elems[elemIndex].expression_of_set.size(); i++){
+        for (int i = 0; i < elements[elemIndex].expression_of_set.size(); i++){
             //计算第i个表达式
-            caluteExpressionFirst(elemIndex, i, temp);
-            publicTools::connetVector(First[elemIndex], temp);
+            calculate_expression_first(elemIndex, i, temp);
+            public_tool::connect_vector(first[elemIndex], temp);
         }
         //对于这种情况有没有可能出现：
         //A->TAb|c|T
         //T->@|t
         //进行递归了
-        for (int i = 0; i < firstTemp.size(); i++){
-            caluteExpressionFirst(elemIndex, firstTemp[i], temp, false);
-            publicTools::connetVector(First[elemIndex], temp);
+        for (int i = 0; i < first_temp.size(); i++){
+            calculate_expression_first(elemIndex, first_temp[i], temp, false);
+            public_tool::connect_vector(first[elemIndex], temp);
         }
 
     }
@@ -499,70 +499,70 @@ bool GramerLR::getFirst(int elemIndex){
 
 
 //计算elems[elemIndex]的expressIndex下标的表达式的first集合，结果放在result里面
-void  GramerLR::caluteExpressionFirst(int elemIndex, int expressionIndex, vector<int>& result, bool choose){
+void  GrammarLR::calculate_expression_first(int elemIndex, int expressionIndex, vector<int>& result, bool choose){
 
     result.clear();
-    //vector<int>::iterator it =elems[elemIndex].expression_of_set[expressionIndex].expression.begin() ;
-    //vector<int>::iterator end = elems[elemIndex].expression_of_set[expressionIndex].expression.end();
+    //vector<int>::iterator it =elements[elemIndex].expression_of_set[expressionIndex].expression.begin() ;
+    //vector<int>::iterator end = elements[elemIndex].expression_of_set[expressionIndex].expression.end();
 
 
 
 
-    for (int i = 0; i < elems[elemIndex].expression_of_set[expressionIndex].expression.size(); i++){
+    for (int i = 0; i < elements[elemIndex].expression_of_set[expressionIndex].expression.size(); i++){
 
         //对于这种情况有没有可能出现：
         //A->TAb|c|T
         //T->@|t
         //进行递归了
-        if (elems[elemIndex].expression_of_set[expressionIndex][i] == elemIndex) {
+        if (elements[elemIndex].expression_of_set[expressionIndex][i] == elemIndex) {
 
             //后续处理
-            if (publicTools::isInA(First[elemIndex], -1)) continue;
+            if (public_tool::is_in_vector(first[elemIndex], -1)) continue;
             else{
-                if (choose) this->firstTemp.push_back(expressionIndex);
+                if (choose) this->first_temp.push_back(expressionIndex);
                 break;
             }
 
         }
 
-        if (getFirst(elems[elemIndex].expression_of_set[expressionIndex][i])){
+        if (get_first(elements[elemIndex].expression_of_set[expressionIndex][i])){
 
-            if (i == elems[elemIndex].expression_of_set[expressionIndex].expression.size() - 1){
-                publicTools::connetVector(result, First[elems[elemIndex].expression_of_set[expressionIndex][i]]);
+            if (i == elements[elemIndex].expression_of_set[expressionIndex].expression.size() - 1){
+                public_tool::connect_vector(result, first[elements[elemIndex].expression_of_set[expressionIndex][i]]);
             }
             else
             {
                 vector<int> notNULL;//将空串除去
-                int length = First[elems[elemIndex].expression_of_set[expressionIndex][i]].size();
-                vector<int> tmpF = First[elems[elemIndex].expression_of_set[expressionIndex][i]];
+                int length = first[elements[elemIndex].expression_of_set[expressionIndex][i]].size();
+                vector<int> tmpF = first[elements[elemIndex].expression_of_set[expressionIndex][i]];
                 for (int j = 0; j < length; j++){
                     if (tmpF[j] != -1){
                         notNULL.push_back(tmpF[j]);
                     }
                 }
-                publicTools::connetVector(result, notNULL);
+                public_tool::connect_vector(result, notNULL);
             }
 
         }
         else
         {
-            if (!publicTools::isInA(result, -1)) result.push_back(-1);
+            if (!public_tool::is_in_vector(result, -1)) result.push_back(-1);
             break;
         }
 
         //-1不在这个式子里面后面不用继续了
-        if (!publicTools::isInA(First[elems[elemIndex].expression_of_set[expressionIndex][i]], -1)) break;
+        if (!public_tool::is_in_vector(first[elements[elemIndex].expression_of_set[expressionIndex][i]], -1)) break;
 
     }
 }
 
 
-bool lRGramer::cmp(Project& a, Project& b){
+bool lr_grammar::cmp(Project& a, Project& b){
     return a < b;
 }
 
 
-bool lRGramer::isInA(const vector<Project>& a, const Project& b){
+bool lr_grammar::is_in_vector(const vector<Project>& a, const Project& b){
     bool result = false;
     for (int i = 0; i < a.size(); i++){
         if (a[i] == b){
@@ -573,9 +573,9 @@ bool lRGramer::isInA(const vector<Project>& a, const Project& b){
     return result;
 }
 
-void lRGramer::connetVector(vector<Project>& a, const vector<Project>& b){
+void lr_grammar::conncet_vector(vector<Project>& a, const vector<Project>& b){
     for (int i = 0; i < b.size(); i++){
-        if (!isInA(a, b[i])){
+        if (!is_in_vector(a, b[i])){
             a.push_back(b[i]);
         }
     }
@@ -584,15 +584,15 @@ void lRGramer::connetVector(vector<Project>& a, const vector<Project>& b){
 
 
 //生成Follow集合
-void GramerLR::createFollowSet(){
+void GrammarLR::create_follow_set(){
 
     vector<int> temp;
     //每个非终结符
     for (int i = 0; i < not_finally_charIndex.size(); i++){
         //计算Follw需要的是各个表达式子,遍历第i个非终结符的各个表达式
-        for (int j = 0; j < elems[not_finally_charIndex[i]].expression_of_set.size(); j++){
+        for (int j = 0; j < elements[not_finally_charIndex[i]].expression_of_set.size(); j++){
             //第j个表达式
-            ExpressLR& expreesion = elems[not_finally_charIndex[i]].expression_of_set[j];
+            ExpressLR& expreesion = elements[not_finally_charIndex[i]].expression_of_set[j];
             for (int m = 0; m < expreesion.expression.size(); m++){
 
 
@@ -602,11 +602,11 @@ void GramerLR::createFollowSet(){
                 }
 
                 //是终结符不用计算
-                if (elems[expreesion[m]].isFinally) continue;
+                if (elements[expreesion[m]].is_finally) continue;
 
                 //获得First集合
-                this->getFollowByFirst(i, expreesion, m + 1, temp);
-                publicTools::connetVector(Follow[expreesion[m]], temp);
+                this->get_follow_by_first(i, expreesion, m + 1, temp);
+                public_tool::connect_vector(follow[expreesion[m]], temp);
 
             }
 
@@ -615,14 +615,14 @@ void GramerLR::createFollowSet(){
 
     //考虑follow集合的添加
     for (int i = 0; i < not_finally_charIndex.size(); i++){
-        adjustFollow(i);
+        adjust_follow(i);
     }
 
 }
 
 
 
-void GramerLR::getFollowByFirst(int elemIndex, ExpressLR express, int begin, vector<int>& result){
+void GrammarLR::get_follow_by_first(int elemIndex, ExpressLR express, int begin, vector<int>& result){
     result.clear();
     vector<int> tmp;
 
@@ -635,14 +635,14 @@ void GramerLR::getFollowByFirst(int elemIndex, ExpressLR express, int begin, vec
     for (begin = begin; begin < express.expression.size(); begin++){
 
         //如果空不在退出
-        if (!publicTools::isInA(First[express[begin]], -1)){
-            publicTools::connetVector(result, First[express[begin]]);
+        if (!public_tool::is_in_vector(first[express[begin]], -1)){
+            public_tool::connect_vector(result, first[express[begin]]);
             break;
         }
         else
         {
-            clearNull(First[express[begin]], tmp);
-            publicTools::connetVector(result, tmp);
+            clear_null(first[express[begin]], tmp);
+            public_tool::connect_vector(result, tmp);
         }
 
     }
@@ -653,20 +653,20 @@ void GramerLR::getFollowByFirst(int elemIndex, ExpressLR express, int begin, vec
 
 }
 
-void GramerLR::adjustFollow(int index){
+void GrammarLR::adjust_follow(int index){
     //保存使用
-    vector<int> tempFollow = Follow[not_finally_charIndex[index]];
+    vector<int> tempFollow = follow[not_finally_charIndex[index]];
     for (int i = 0; i < tempFollow.size(); i++){
-        if (!elems[tempFollow[i]].isFinally){
+        if (!elements[tempFollow[i]].is_finally){
             //在原来的Follow中将这个非终结符删除
-            vector<int>::const_iterator deleteIt = find(Follow[not_finally_charIndex[index]].begin(), Follow[not_finally_charIndex[index]].end(), tempFollow[i]);
-            Follow[not_finally_charIndex[index]].erase(deleteIt);
+            vector<int>::const_iterator deleteIt = find(follow[not_finally_charIndex[index]].begin(), follow[not_finally_charIndex[index]].end(), tempFollow[i]);
+            follow[not_finally_charIndex[index]].erase(deleteIt);
 
             //如果两个是一样的
             if (not_finally_charIndex[index] != tempFollow[i]) {
-                adjustFollow(tempFollow[i]);
+                adjust_follow(tempFollow[i]);
 
-                publicTools::connetVector(Follow[not_finally_charIndex[index]], Follow[tempFollow[i]]);
+                public_tool::connect_vector(follow[not_finally_charIndex[index]], follow[tempFollow[i]]);
 
             }
 
@@ -684,16 +684,16 @@ void GramerLR::adjustFollow(int index){
 
 
 //构造DFA
-void GramerLR::createDFAStates(){
+void GrammarLR::create_dfa_states(){
 
 
     //开始计算,项目的点的下标是下一个
     //项目A->.abb 点的位置为0
     vector<Project> projects;
-    projects.push_back(Project(findName(elems[0].name + "'"), 0, 0));
+    projects.push_back(Project(find_name(elements[0].name + "'"), 0, 0));
     closure(projects);
 
-    this->states.push_back(DFAState(projects,0,elems.size()));
+    this->states.push_back(DFAState(projects, 0, elements.size()));
 
 
     //开始计算
@@ -706,11 +706,11 @@ void GramerLR::createDFAStates(){
             Project tmp = states[stateIndex].projects[i];
 
             //这是一个可移进后面没有smove了
-            if (tmp.projectPoint == elems[tmp.elemKey].expression_of_set[tmp.expressIndex].expression.size()){
+            if (tmp.projectPoint == elements[tmp.elemKey].expression_of_set[tmp.expressIndex].expression.size()){
                 continue;
             }
             //.后面的数的元素
-            int elemIndex = elems[tmp.elemKey].expression_of_set[tmp.expressIndex][tmp.projectPoint];
+            int elemIndex = elements[tmp.elemKey].expression_of_set[tmp.expressIndex][tmp.projectPoint];
 
             //先判断这个元素是不是已经计算了,不是-1已经计算了
             if (states[stateIndex].next[elemIndex] != -1) continue;
@@ -733,7 +733,7 @@ void GramerLR::createDFAStates(){
 
             //新状态，需要被push
             if (countIndex == states.size()){
-                states.push_back(DFAState(projects, countIndex, elems.size()));
+                states.push_back(DFAState(projects, countIndex, elements.size()));
             }
 
             //给原来的状态进行调整
@@ -748,7 +748,7 @@ void GramerLR::createDFAStates(){
 
 
 //smove运算，得到的是一个状态集合,求input状态经过elem[elemIndex]后得到的DFA项目集合
-void GramerLR::smove(DFAState& input, int elemIndex, vector<Project>& result){
+void GrammarLR::smove(DFAState& input, int elemIndex, vector<Project>& result){
     //结果清除一下
     result.clear();
     int elemKey, express, projectPoint;//后面好编写
@@ -762,10 +762,10 @@ void GramerLR::smove(DFAState& input, int elemIndex, vector<Project>& result){
         projectPoint = input.projects[i].projectPoint;
 
         //先判断是不是在结尾
-        if (projectPoint == elems[elemKey].expression_of_set[express].expression.size()) continue;
+        if (projectPoint == elements[elemKey].expression_of_set[express].expression.size()) continue;
 
         //不是在结尾看看是不是对应的字符
-        if (elems[elemKey].expression_of_set[express][projectPoint] == elemIndex){
+        if (elements[elemKey].expression_of_set[express][projectPoint] == elemIndex){
             result.push_back(Project(elemKey, express, projectPoint + 1));
         }
     }
@@ -773,7 +773,7 @@ void GramerLR::smove(DFAState& input, int elemIndex, vector<Project>& result){
 }
 
 //求空闭包,求result集合的空闭包，会添加，最后会增加到result里面
-void GramerLR::closure(vector<Project>& result){
+void GrammarLR::closure(vector<Project>& result){
 
     int elemKey, express, projectPoint;//后面好编写
     vector<Project> tmp;
@@ -785,22 +785,22 @@ void GramerLR::closure(vector<Project>& result){
         express = result[i].expressIndex;
         projectPoint = result[i].projectPoint;
         //先判断是不是在结尾
-        if (projectPoint == elems[elemKey].expression_of_set[express].expression.size()) continue;
+        if (projectPoint == elements[elemKey].expression_of_set[express].expression.size()) continue;
 
-        int newElemKey = elems[elemKey].expression_of_set[express][projectPoint];
+        int newElemKey = elements[elemKey].expression_of_set[express][projectPoint];
         //是终结符，不用管
-        if (elems[newElemKey].isFinally) continue;
+        if (elements[newElemKey].is_finally) continue;
 
         //不是终结符号
         //先将他给赋值过来，后来继续合并
         tmp.clear();
-        for (int j = 0; j < elems[newElemKey].expression_of_set.size(); j++){
+        for (int j = 0; j < elements[newElemKey].expression_of_set.size(); j++){
 
             tmp.push_back(Project(newElemKey, j, 0));
 
         }
 
-        connetVector(result, tmp);
+        conncet_vector(result, tmp);
 
 
     }
@@ -810,19 +810,19 @@ void GramerLR::closure(vector<Project>& result){
 
 
 
-void GramerLR::createActionTable(){
+void GrammarLR::create_action_table(){
 
     //1.初始化一下表,有状态数那么多个行，有元素个数那么多个的列，初始化的所有符列都是ERROR
 
     vector<Action> t;
     Action action;
     action.type = ERROR;
-    for (int i = 0; i < elems.size(); i++){
+    for (int i = 0; i < elements.size(); i++){
         t.push_back(action);
     }
 
     for (int i = 0; i < states.size(); i++){
-        actionTable.push_back(t);
+        action_table.push_back(t);
     }
 
 
@@ -830,17 +830,17 @@ void GramerLR::createActionTable(){
     for (int i = 0; i < states.size(); i++){
 
         //转移的直接提取就行,遍历next函数
-        for (int j = 0; j < states[i].elemcount; j++){
+        for (int j = 0; j < states[i].elementCount; j++){
 
             //不等于-1说明可以接受这个转移
             if (states[i].next[j] != -1){
 
-                if (actionTable[i][j].type != ERROR){
+                if (action_table[i][j].type != ERROR){
                     cout << "冲突";
-                    cout << actionTable[i][states[i].next[j]].type << "to" << " SMOVE";
+                    cout << action_table[i][states[i].next[j]].type << "to" << " SMOVE";
                 }
-                actionTable[i][j].type = SMOVE;
-                actionTable[i][j].choose.state = states[i].next[j];
+                action_table[i][j].type = SMOVE;
+                action_table[i][j].choose.state = states[i].next[j];
 
             }
 
@@ -850,24 +850,24 @@ void GramerLR::createActionTable(){
         //归约开始,需要检查是每一个项目，判断点的位置是不是在最后
         for (int j = 0; j < states[i].projects.size(); j++){
             Project tmpP = states[i].projects[j];
-            if (elems[tmpP.elemKey].expression_of_set[tmpP.expressIndex].expression.size() == tmpP.projectPoint){
+            if (elements[tmpP.elemKey].expression_of_set[tmpP.expressIndex].expression.size() == tmpP.projectPoint){
 
                 //表示点在表达式最后，进行归约
                 //先判断是不是终结符号,是就是acc而不是REDUCE
-                if (tmpP.elemKey == findName(elems[0].name + "'")){
-                    actionTable[i][findName("#")].type = ACC;
+                if (tmpP.elemKey == find_name(elements[0].name + "'")){
+                    action_table[i][find_name("#")].type = ACC;
                     continue;
 
                 }
-                for (int fi = 0; fi < Follow[tmpP.elemKey].size(); fi++){
+                for (int fi = 0; fi < follow[tmpP.elemKey].size(); fi++){
 
-                    if (actionTable[i][Follow[tmpP.elemKey][fi]].type != ERROR){
+                    if (action_table[i][follow[tmpP.elemKey][fi]].type != ERROR){
                         cout << "冲突";
-                        cout << actionTable[i][Follow[tmpP.elemKey][fi]].type << "to" << " REDUCE";
+                        cout << action_table[i][follow[tmpP.elemKey][fi]].type << "to" << " REDUCE";
                     }
-                    actionTable[i][Follow[tmpP.elemKey][fi]].type = REDUCE;
-                    actionTable[i][Follow[tmpP.elemKey][fi]].choose.R.elemIndex = tmpP.elemKey;
-                    actionTable[i][Follow[tmpP.elemKey][fi]].choose.R.expressIndex = tmpP.expressIndex;
+                    action_table[i][follow[tmpP.elemKey][fi]].type = REDUCE;
+                    action_table[i][follow[tmpP.elemKey][fi]].choose.R.elemIndex = tmpP.elemKey;
+                    action_table[i][follow[tmpP.elemKey][fi]].choose.R.expressIndex = tmpP.expressIndex;
                 }
 
             }
@@ -884,7 +884,7 @@ void GramerLR::createActionTable(){
 
 }
 
-void lRGramer::clearNull(const vector<int>& a, vector<int>& result, int value){
+void lr_grammar::clear_null(const vector<int>& a, vector<int>& result, int value){
     result.clear();
     for (int i = 0; i < a.size(); i++){
         if (a[i] != value){
@@ -907,12 +907,12 @@ struct stackElem
 };
 
 //根据预测分析表进行判断
-bool  GramerLR::sim(char* testString){
+bool  GrammarLR::sim(char* testString){
 
     bool result = true;
     //不使用testString，出现双字符串无法解释;
     vector<string> ipString;
-    publicTools::parseElem(testString, ipString);
+    public_tool::parse_elem(testString, ipString);
 
     stack<stackElem> s;//指导栈
     vector<stackElem> elemprint;//输出作用
@@ -926,19 +926,20 @@ bool  GramerLR::sim(char* testString){
     int ipIndex = 0;//ip的指向
 
     stackElem e;
-    e.elemKey = findName("#");//#是开始字符
+    e.elemKey = find_name("#");//#是开始字符
     e.states = 0;//0是初态
     s.push(e);
     elemprint.push_back(e);
-    ReducebyExpress r;
+    ReduceByExpress r;
     int st;
-    while (actionTable[e.states][findName(ipString[ipIndex])].type == REDUCE || actionTable[e.states][findName(ipString[ipIndex])].type == SMOVE){
+    while (action_table[e.states][find_name(ipString[ipIndex])].type == REDUCE || action_table[e.states][find_name(
+            ipString[ipIndex])].type == SMOVE){
         e = s.top();
 
         //1.输出栈
         tmp = "";
         for (int i = 0; i < elemprint.size(); i++){
-            tmp = tmp + elems[elemprint[i].elemKey].name;
+            tmp = tmp + elements[elemprint[i].elemKey].name;
             sstream.clear();
             sstream << elemprint[i].states;
             sstream >> buffer;
@@ -954,7 +955,7 @@ bool  GramerLR::sim(char* testString){
         sprintf(buffer, formatC, tmp.c_str());
         text = text + buffer;
 
-        switch (actionTable[e.states][findName(ipString[ipIndex])].type)
+        switch (action_table[e.states][find_name(ipString[ipIndex])].type)
         {
             //不会出现
             case ERROR: break;
@@ -964,27 +965,27 @@ bool  GramerLR::sim(char* testString){
                 //3.进行的动作
                 text = text + "REDUCE:";
                 //get表达式
-                r = actionTable[e.states][findName(ipString[ipIndex])].choose.R;
-                text = text + elems[r.elemIndex].name + "->";
-                for (int i = 0; i < elems[r.elemIndex].expression_of_set[r.expressIndex].expression.size(); i++){
-                    if (elems[r.elemIndex].expression_of_set[r.expressIndex][i] == -1){ continue; }
-                    text = text + elems[elems[r.elemIndex].expression_of_set[r.expressIndex][i]].name;
+                r = action_table[e.states][find_name(ipString[ipIndex])].choose.R;
+                text = text + elements[r.elemIndex].name + "->";
+                for (int i = 0; i < elements[r.elemIndex].expression_of_set[r.expressIndex].expression.size(); i++){
+                    if (elements[r.elemIndex].expression_of_set[r.expressIndex][i] == -1){ continue; }
+                    text = text + elements[elements[r.elemIndex].expression_of_set[r.expressIndex][i]].name;
                 }
                 text = text + "\n";
 
                 //出栈
-                for (int i = 0; i < elems[r.elemIndex].expression_of_set[r.expressIndex].expression.size(); i++){
+                for (int i = 0; i < elements[r.elemIndex].expression_of_set[r.expressIndex].expression.size(); i++){
                     s.pop();
                     elemprint.pop_back();
                 }
                 //替换终结符操作
                 e = s.top();
-                if (actionTable[e.states][r.elemIndex].type == ERROR){
+                if (action_table[e.states][r.elemIndex].type == ERROR){
                     text = text + "ERROR";
                     break;//跳出swtich
                 }
                 e.elemKey = r.elemIndex;
-                e.states = actionTable[e.states][r.elemIndex].choose.state;
+                e.states = action_table[e.states][r.elemIndex].choose.state;
                 s.push(e);
                 elemprint.push_back(e);
                 break;
@@ -992,14 +993,14 @@ bool  GramerLR::sim(char* testString){
                 //3.进行的动作
                 text = text + "SMOVE:";
                 //get表达式
-                st = actionTable[e.states][findName(ipString[ipIndex])].choose.state;
+                st = action_table[e.states][find_name(ipString[ipIndex])].choose.state;
                 sstream.clear();
                 sstream << st;
                 sstream >> buffer;
                 text = text + buffer + "\n";
 
                 //入栈就行
-                e.elemKey = findName(ipString[ipIndex]);
+                e.elemKey = find_name(ipString[ipIndex]);
                 e.states = st;
                 s.push(e);
                 elemprint.push_back(e);
@@ -1013,7 +1014,7 @@ bool  GramerLR::sim(char* testString){
     }
 
 
-    if (actionTable[e.states][findName(ipString[ipIndex])].type == ERROR) {
+    if (action_table[e.states][find_name(ipString[ipIndex])].type == ERROR) {
         result = false;
         text = text + "ERROR\n";
     }
