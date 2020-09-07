@@ -8,7 +8,7 @@
 #include "head/LL.h"
 using namespace std;
 
-void testLL(){
+void test_ll(){
     string test[4];
 
     /*
@@ -26,13 +26,13 @@ void testLL(){
 
     //test[2] = "A1->c$A1$|ad$A1$|@";
 
-    llGramer::GramerLL c(test, 4);
+    ll_grammar::GrammarLeft c(test, 4);
 
     c.sim("$id$+$id$*$id$;#");
 
 }
 
-void testLR(){
+void test_lr(){
     string test[4];
 
     /*
@@ -50,7 +50,7 @@ void testLR(){
 
     //test[2] = "A1->c$A1$|ad$A1$|@";
 
-    lRGramer::GramerLR c(test, 3);
+    lr_grammar::GrammarLR c(test, 3);
 
     c.sim("$id$--$id$*$id$#");
 
@@ -58,7 +58,7 @@ void testLR(){
 
 
 int main(){
-    //testLL();
-    testLR();
+    //test_ll();
+    test_lr();
     return 0;
 }
